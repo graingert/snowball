@@ -25,11 +25,13 @@ matrix:
       dist: bionic
       env: RUST=rust
     - language: csharp
-      mono:
-        - latest
-        - 2.10.8
       env: MCS=mcs
     - env: FPC=fpc
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - fpc
     # The pure Python versions run slowly so we need to thin the testdata
     # for languages such as Arabic where there's a lot, or else the build
     # hits the travis time limit.  With pypy, it's enough faster than we
@@ -67,10 +69,6 @@ before_install:
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
   - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
-  - test -z "$MCS" || sudo apt-get update -qq
-  - test -z "$MCS" || sudo apt-get install -qq mono-complete
-  - test -z "$FPC" || sudo apt-get update -qq
-  - test -z "$FPC" || sudo apt-get install -qq fpc
 script:
   - make CC="${CC:-gcc}$cc_append"
   - test -z "$c_tests" || make check CC="${CC:-gcc}$cc_append" STEMMING_DATA=snowball-data
